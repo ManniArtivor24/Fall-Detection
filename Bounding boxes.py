@@ -83,7 +83,7 @@ def draw_bounding_box(frame, keypoints, confidence_threshold):
         cv2.rectangle(frame, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), (0, 255, 0), 2)
 
 # Read in camera input with OpenCV
-cap = cv2.VideoCapture("Video Datasets Samples/boxing.mp4")
+cap = cv2.VideoCapture("UR Fall Dataset Sample Videos/adl-10-cam0.mp4")
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -115,3 +115,4 @@ while cap.isOpened():
 
 cap.release()
 cv2.destroyAllWindows()
+
