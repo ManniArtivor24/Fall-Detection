@@ -3,6 +3,7 @@ import tensorflow_hub as hub
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import time
 
 
 # load movenet model
@@ -60,9 +61,14 @@ def loop_through_persons(frame, keypoints_scores,edges,confidence_threshold):
         draw_keypoints(frame, person,confidence_threshold)
 
 # read in camera input with openCV
-cap = cv2.VideoCapture("walking group.mp4")
+cap = cv2.VideoCapture("fall-23-cam0.mp4")
 while cap.isOpened():
     ret, frame = cap.read()
+    if not ret:
+        break
+
+    start_time = time.time()
+
 
     # resize img for usage with model. Must be a factor of 32
     img = frame.copy()
@@ -74,11 +80,16 @@ while cap.isOpened():
     keypoints_scores = results['output_0'].numpy()[:, :, :51].reshape((6, 17, 3))
 
     # call render function
-    loop_through_persons(frame, keypoints_scores, EDGES, 0.4)
+    loop_through_persons(frame, keypoints_scores, EDGES, 0.2)
 
     cv2.imshow('MoveNet Pose Detection', frame)
 
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Frame processed in {elapsed_time:.2f} seconds")
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 cap.release()
 cv2.destroyAllWindows()
