@@ -5,7 +5,7 @@ import cv2
 import time
 
 # Load MoveNet model
-model = hub.load("https://www.kaggle.com/models/google/movenet/TensorFlow2/multipose-lightning/1")
+model = hub.load("https://tfhub.dev/google/movenet/multipose/lightning/1")
 movenet = model.signatures['serving_default']
 
 def draw_keypoints(frame, keypoints, confidence_threshold):
@@ -18,24 +18,10 @@ def draw_keypoints(frame, keypoints, confidence_threshold):
             cv2.circle(frame, (int(kx), int(ky)), 4, (0, 255, 0), -1)
 
 EDGES = {
-    (0, 1): 'm',
-    (0, 2): 'c',
-    (1, 3): 'm',
-    (2, 4): 'c',
-    (0, 5): 'm',
-    (0, 6): 'c',
-    (5, 7): 'm',
-    (7, 9): 'm',
-    (6, 8): 'c',
-    (8, 10): 'c',
-    (5, 6): 'y',
-    (5, 11): 'm',
-    (6, 12): 'c',
-    (11, 12): 'y',
-    (11, 13): 'm',
-    (13, 15): 'm',
-    (12, 14): 'c',
-    (14, 16): 'c'
+    (0, 1): 'm', (0, 2): 'c', (1, 3): 'm', (2, 4): 'c', (0, 5): 'm',
+    (0, 6): 'c', (5, 7): 'm', (7, 9): 'm', (6, 8): 'c', (8, 10): 'c',
+    (5, 6): 'y', (5, 11): 'm', (6, 12): 'c', (11, 12): 'y', (11, 13): 'm',
+    (13, 15): 'm', (12, 14): 'c', (14, 16): 'c'
 }
 
 def draw_connections(frame, keypoints, edges, confidence_threshold):
@@ -93,7 +79,7 @@ while cap.isOpened():
     start_time = time.time()
 
     # Resize img for usage with model. Must be a factor of 32
-    img = cv2.resize(frame, (256, 128))
+    img = cv2.resize(frame, (128, 256))
     img = np.expand_dims(img, axis=0)
     input_img = tf.cast(img, dtype=tf.int32)
 
