@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import os
 
-
 def calculate_optical_flow_lk(prev_frame, next_frame):
     # Parameters for Lucas-Kanade optical flow
     lk_params = dict(winSize=(15, 15),
