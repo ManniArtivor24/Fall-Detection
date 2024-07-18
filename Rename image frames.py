@@ -1,6 +1,5 @@
 import os
 
-
 def rename_files_in_folder(folder_path):
     # List all files in the folder
     files = os.listdir(folder_path)
@@ -26,4 +25,4 @@ def rename_files_in_folder(folder_path):
 
 
 # Replace 'your_folder_path_here' with the path to your folder
-rename_files_in_folder('UP Fall Dataset/ Falling from seated position - Activity 5 ')
+rename_files_in_folder('UP Fall Dataset/Falling from seated position - Activity 5 ')
