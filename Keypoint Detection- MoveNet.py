@@ -2,8 +2,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import cv2
-import time
 import os
+from tqdm import tqdm
 
 # Load MoveNet model
 model = hub.load("https://tfhub.dev/google/movenet/multipose/lightning/1")
@@ -37,57 +37,36 @@ def draw_connections(frame, keypoints, edges, confidence_threshold):
         if (c1 > confidence_threshold) & (c2 > confidence_threshold):
             cv2.line(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
 
-# Loop through each person in the frame (max 6)
 def loop_through_persons(frame, keypoints_scores, edges, confidence_threshold):
     for person in keypoints_scores:
         draw_connections(frame, person, edges, confidence_threshold)
         draw_keypoints(frame, person, confidence_threshold)
 
-# Read in camera input with OpenCV
-cap = cv2.VideoCapture("UR Fall Dataset Sample Videos/fall-23-cam0.mp4")
-output_dir = 'path_to_output_keypoints'  # Replace with your desired output directory
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+def process_images_for_keypoints(input_folder, output_folder):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
-keypoints_all_frames = []
+    images = sorted([os.path.join(input_folder, f) for f in os.listdir(input_folder) if f.endswith('.jpg') or f.endswith('.png')])
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+    for i, img_path in enumerate(tqdm(images, desc="Processing keypoints")):
+        frame = cv2.imread(img_path)
+        if frame is None:
+            continue
 
-    start_time = time.time()
+        img = tf.image.resize_with_pad(tf.expand_dims(frame, axis=0), 128, 256)
+        input_img = tf.cast(img, dtype=tf.int32)
 
-    # Resize img for usage with model. Must be a factor of 32
-    img = frame.copy()
-    img = tf.image.resize_with_pad(tf.expand_dims(img, axis=0), 128, 256)
-    input_img = tf.cast(img, dtype=tf.int32)
+        results = movenet(input_img)
+        keypoints_scores = results['output_0'].numpy()[:, :, :51].reshape((6, 17, 3))
 
-    # Detection
-    results = movenet(input_img)
-    keypoints_scores = results['output_0'].numpy()[:, :, :51].reshape((6, 17, 3))
+        loop_through_persons(frame, keypoints_scores, EDGES, 0.2)
 
-    # Call render function
-    loop_through_persons(frame, keypoints_scores, EDGES, 0.2)
+        output_img_path = os.path.join(output_folder, f'keypoints_{i:04d}.png')
+        cv2.imwrite(output_img_path, frame)
 
-    # Store keypoints for each frame
-    keypoints_all_frames.append(keypoints_scores)
+# Directories
+input_folder = 'UP Fall Dataset/Falling backwards - Activity 1'
+keypoint_image_folder = 'keypoints_image_results'
 
-    cv2.imshow('MoveNet Pose Detection', frame)
-
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Frame processed in {elapsed_time:.2f} seconds")
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-
-# Convert to numpy array and save
-keypoints_all_frames = np.array(keypoints_all_frames)
-output_path = os.path.join(output_dir, 'keypoints.npy')
-np.save(output_path, keypoints_all_frames)
-
-print(f"Keypoints saved to {output_path}")
+# Process images for keypoints
+process_images_for_keypoints(input_folder, keypoint_image_folder)
