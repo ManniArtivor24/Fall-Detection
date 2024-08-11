@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
+
 def calculate_optical_flow_lk(prev_frame, next_frame, prev_points):
     lk_params = dict(winSize=(15, 15),
                      maxLevel=2,
@@ -20,6 +21,7 @@ def calculate_optical_flow_lk(prev_frame, next_frame, prev_points):
 
     return good_prev, good_next
 
+
 def visualize_optical_flow_lk(frames, keypoints_sequence):
     flow_image = cv2.addWeighted(frames[0], 0.5, frames[-1], 0.5, 0)
 
@@ -33,8 +35,10 @@ def visualize_optical_flow_lk(frames, keypoints_sequence):
             flow_image = cv2.circle(flow_image, (a, b), 5, (0, 0, 255), -1)
     return flow_image
 
+
 def process_image_frames_lk(frame_folder, output_image_folder, output_numpy_folder):
-    frames = sorted([os.path.join(frame_folder, f) for f in os.listdir(frame_folder) if f.endswith('.jpg') or f.endswith('.png')])
+    frames = sorted(
+        [os.path.join(frame_folder, f) for f in os.listdir(frame_folder) if f.endswith('.jpg') or f.endswith('.png')])
 
     if len(frames) < 6:
         print("Not enough frames to process.")
@@ -82,10 +86,11 @@ def process_image_frames_lk(frame_folder, output_image_folder, output_numpy_fold
         output_numpy_path = os.path.join(output_numpy_folder, f'flow_{i:04d}.npy')
         np.save(output_numpy_path, flow_data)
 
+
 # Directories
-keypoint_image_folder = 'keypoints_image_results'
-output_image_folder_lk = 'OF_image_output'
-output_numpy_folder_lk = 'OF_numpy_results'
+keypoint_image_folder = '/Users/manniartivor/Desktop/Major Project Reserach (2)/Fall-Detection-/keypoints_image_results Activity 2 '
+output_image_folder_lk = 'OF_image_output_activity 2'
+output_numpy_folder_lk = 'OF_numpy_results_activity 2'
 
 # Use keypoint images for optical flow
 process_image_frames_lk(keypoint_image_folder, output_image_folder_lk, output_numpy_folder_lk)

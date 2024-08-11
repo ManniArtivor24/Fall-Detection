@@ -42,9 +42,11 @@ def loop_through_persons(frame, keypoints_scores, edges, confidence_threshold):
         draw_connections(frame, person, edges, confidence_threshold)
         draw_keypoints(frame, person, confidence_threshold)
 
-def process_images_for_keypoints(input_folder, output_folder):
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+def process_images_for_keypoints(input_folder, keypoint_image_folder, keypoint_numpy_folder):
+    if not os.path.exists(keypoint_image_folder):
+        os.makedirs(keypoint_image_folder)
+    if not os.path.exists(keypoint_numpy_folder):
+        os.makedirs(keypoint_numpy_folder)
 
     images = sorted([os.path.join(input_folder, f) for f in os.listdir(input_folder) if f.endswith('.jpg') or f.endswith('.png')])
 
@@ -61,12 +63,18 @@ def process_images_for_keypoints(input_folder, output_folder):
 
         loop_through_persons(frame, keypoints_scores, EDGES, 0.2)
 
-        output_img_path = os.path.join(output_folder, f'keypoints_{i:04d}.png')
+        # Save keypoints visualization image
+        output_img_path = os.path.join(keypoint_image_folder, f'keypoints_{i:04d}.png')
         cv2.imwrite(output_img_path, frame)
+
+        # Save keypoints numpy file
+        output_numpy_path = os.path.join(keypoint_numpy_folder, f'keypoints_{i:04d}.npy')
+        np.save(output_numpy_path, keypoints_scores)
 
 # Directories
 input_folder = 'UP Fall Dataset/Falling backwards - Activity 1'
-keypoint_image_folder = 'keypoints_image_results'
+keypoint_image_folder = 'keypoints_image_results Activity 1'
+keypoint_numpy_folder = 'keypoint_numpy_results Activity 1'
 
 # Process images for keypoints
-process_images_for_keypoints(input_folder, keypoint_image_folder)
+process_images_for_keypoints(input_folder, keypoint_image_folder, keypoint_numpy_folder)

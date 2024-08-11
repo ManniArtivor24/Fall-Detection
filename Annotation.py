@@ -6,8 +6,8 @@ def collect_frames_and_labels(path, label):
     return [(frame, label) for frame in frames]
 
 # Paths to directories
-falling_paths = ['path/to/falling_forward', 'path/to/falling_backward', 'path/to/falling_sideways']
-normal_path = 'path/to/normal_activity'
+falling_paths = ['UP Fall Dataset/Falling backwards - Activity 1', 'UP Fall Dataset/Falling forward using hands - Activity 2', 'UP Fall Dataset/Falling forward using knees - Activity 3','']
+normal_path = 'Picking an object - Activity 9'
 
 # Collect frames and assign labels
 falling_frames = []
