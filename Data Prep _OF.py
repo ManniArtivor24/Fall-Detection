@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 # Set the path to the directory where the features are stored
-features_dir = '//Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results '
+features_dir = '/Users/manniartivor/PycharmProjects/Fall-Detection/Dense OF Numpy Results '
 
 # Initialize lists to hold data and labels
 X = []
@@ -11,17 +11,17 @@ y = []
 
 # Mapping of folder names to numerical labels (for binary classification)
 label_map = {
-    'keypoint_numpy_results_Falling forward using hands - Activity 2': 1,
-    'keypoint_numpy_results_Falling backwards - Activity 1': 1,
-    'keypoint_numpy_results_Walking - Activity 6 ': 0,
-    'keypoint_numpy_results_Falling forward using knees - Activity 3': 1,
-    'keypoint_numpy_results_Falling from seated position - Activity 5 ': 1,
-    'keypoint_numpy_results_Falling sideways - Activity 4': 1,
-    'keypoint_numpy_results_Jumping - Activity 10': 0,
-    'keypoint_numpy_results_Laying Down - Activity 11': 0,
-    'keypoint_numpy_results_Sitting - Activity 8': 0,
-    'keypoint_numpy_results_Standing - Activity 7 ': 0,
-    'keypoint_numpy_results_Picking an object - Activity 9': 0,
+    'Dense_OF_numpy_results_Falling forward using hands - Activity 2': 1,
+    'Dense_OF_numpy_results_Falling backwards - Activity 1': 1,
+    'Dense_OF_numpy_results_Walking - Activity 6 ': 0,
+    'Dense_OF_numpy_results_Falling forward using knees - Activity 3': 1,
+    'Dense_OF_numpy_results_Falling from seated position - Activity 5 ': 1,
+    'Dense_OF_numpy_results_Falling sideways - Activity 4': 1,
+    'Dense_OF_numpy_results_Jumping - Activity 10': 0,
+    'Dense_OF_numpy_results_Laying Down - Activity 11': 0,
+    'Dense_OF_numpy_results_Sitting - Activity 8': 0,
+    'Dense_OF_numpy_results_Standing - Activity 7 ': 0,
+    'Dense_OF_numpy_results_Picking an object - Activity 9': 0,
 }
 
 # Loop through each folder (class) in the features directory
