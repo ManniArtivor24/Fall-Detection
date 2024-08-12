@@ -1,47 +1,34 @@
 import os
-import cv2
+import cv2 as cv
 import numpy as np
 from tqdm import tqdm
 
+def calculate_dense_optical_flow(frames):
+    hsv = np.zeros_like(frames[0])
+    hsv[..., 1] = 255
 
-def calculate_optical_flow_lk(prev_frame, next_frame, prev_points):
-    lk_params = dict(winSize=(15, 15),
-                     maxLevel=2,
-                     criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+    flow_sequence = []
 
-    prev_gray = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
-    next_gray = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)
+    for i in range(len(frames) - 1):
+        prvs = cv.cvtColor(frames[i], cv.COLOR_BGR2GRAY)
+        next = cv.cvtColor(frames[i + 1], cv.COLOR_BGR2GRAY)
 
-    next_points, status, error = cv2.calcOpticalFlowPyrLK(prev_gray, next_gray, prev_points, None, **lk_params)
+        flow = cv.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+        mag, ang = cv.cartToPolar(flow[..., 0], flow[..., 1])
+        hsv[..., 0] = ang * 180 / np.pi / 2
+        hsv[..., 2] = cv.normalize(mag, None, 0, 255, cv.NORM_MINMAX)
 
-    status = status.reshape(-1)
+        bgr = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+        flow_sequence.append(bgr)
 
-    good_prev = prev_points[status == 1]
-    good_next = next_points[status == 1]
+    return flow_sequence
 
-    return good_prev, good_next
-
-
-def visualize_optical_flow_lk(frames, keypoints_sequence):
-    flow_image = cv2.addWeighted(frames[0], 0.5, frames[-1], 0.5, 0)
-
-    for i in range(len(keypoints_sequence) - 1):
-        good_prev = keypoints_sequence[i]
-        good_next = keypoints_sequence[i + 1]
-        for new, old in zip(good_next, good_prev):
-            a, b = int(new[0]), int(new[1])
-            c, d = int(old[0]), int(old[1])
-            flow_image = cv2.line(flow_image, (a, b), (c, d), (0, 255, 0), 2)
-            flow_image = cv2.circle(flow_image, (a, b), 5, (0, 0, 255), -1)
-    return flow_image
-
-
-def process_image_frames_lk(frame_folder, output_image_folder, output_numpy_folder):
+def process_image_frames_dense_optical_flow(frame_folder, output_image_folder, output_numpy_folder, activity_name):
     frames = sorted(
         [os.path.join(frame_folder, f) for f in os.listdir(frame_folder) if f.endswith('.jpg') or f.endswith('.png')])
 
     if len(frames) < 6:
-        print("Not enough frames to process.")
+        print(f"Not enough frames to process in {activity_name}.")
         return
 
     if not os.path.exists(output_image_folder):
@@ -50,47 +37,45 @@ def process_image_frames_lk(frame_folder, output_image_folder, output_numpy_fold
     if not os.path.exists(output_numpy_folder):
         os.makedirs(output_numpy_folder)
 
-    for i in tqdm(range(len(frames) - 5), desc="Processing frames"):
+    for i in tqdm(range(len(frames) - 5), desc=f"Processing dense optical flow for '{activity_name}'"):
         frame_sequence = []
-        keypoints_sequence = []
 
         for j in range(6):
             frame_path = frames[i + j]
-            frame = cv2.imread(frame_path)
+            frame = cv.imread(frame_path)
             if frame is None:
                 continue
             frame_sequence.append(frame)
 
-            # Extract keypoints from the keypoints drawn on the image
-            keypoints = []
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            detector = cv2.SimpleBlobDetector_create()
-            keypoints = detector.detect(gray)
-            keypoints = np.array([kp.pt for kp in keypoints], dtype=np.float32)
-
-            if keypoints is not None and len(keypoints) > 0:
-                keypoints_sequence.append(keypoints)
-            else:
-                print(f"No keypoints found in frame {i + j}")
-                break
-
-        if len(keypoints_sequence) < 6:
+        if len(frame_sequence) < 6:
             continue
 
-        flow_image = visualize_optical_flow_lk(frame_sequence, keypoints_sequence)
+        flow_sequence = calculate_dense_optical_flow(frame_sequence)
 
-        output_image_path = os.path.join(output_image_folder, f'flow_{i:04d}.png')
-        cv2.imwrite(output_image_path, flow_image)
+        # Save the flow images
+        for k, flow_image in enumerate(flow_sequence):
+            output_image_path = os.path.join(output_image_folder, f'flow_{i+k:04d}.png')
+            cv.imwrite(output_image_path, flow_image)
 
-        flow_data = np.hstack([kp.flatten() for kp in keypoints_sequence])
-        output_numpy_path = os.path.join(output_numpy_folder, f'flow_{i:04d}.npy')
-        np.save(output_numpy_path, flow_data)
+            flow_data = flow_image.flatten()
+            output_numpy_path = os.path.join(output_numpy_folder, f'flow_{i+k:04d}.npy')
+            np.save(output_numpy_path, flow_data)
 
+# Main Directory
+image_base_folder = '/Users/manniartivor/PycharmProjects/Fall-Detection/UP Fall Dataset'
 
-# Directories
-keypoint_image_folder = '/Users/manniartivor/Desktop/Major Project Reserach (2)/Fall-Detection-/keypoints_image_results Activity 2 '
-output_image_folder_lk = 'OF_image_output_activity 2'
-output_numpy_folder_lk = 'OF_numpy_results_activity 2'
+# Loop through each class/activity folder in the dataset directory
+for activity_folder in os.listdir(image_base_folder):
+    image_folder = os.path.join(image_base_folder, activity_folder)
 
-# Use keypoint images for optical flow
-process_image_frames_lk(keypoint_image_folder, output_image_folder_lk, output_numpy_folder_lk)
+    if os.path.isdir(image_folder):
+        activity_name = activity_folder
+
+        print(f"Processing dense optical flow for activity: {activity_name}")
+
+        # Define output folders for dense optical flow
+        output_image_folder_lk = f'Dense_OF_image_output_{activity_name}'
+        output_numpy_folder_lk = f'Dense_OF_numpy_results_{activity_name}'
+
+        # Process images for dense optical flow with a progress bar for each class
+        process_image_frames_dense_optical_flow(image_folder, output_image_folder_lk, output_numpy_folder_lk, activity_name)
