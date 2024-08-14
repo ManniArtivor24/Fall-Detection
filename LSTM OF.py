@@ -9,7 +9,7 @@ from keras.utils import to_categorical
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 # Set the path to the directory where the features are stored
-features_dir = '//Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results '
+features_dir = '/Users/manniartivor/PycharmProjects/Fall-Detection/Dense OF Numpy Results '
 
 # Initialize lists to hold data and labels
 X = []
@@ -17,17 +17,17 @@ y = []
 
 # Mapping of folder names to numerical labels (for binary classification)
 label_map = {
-    'keypoint_numpy_results_Falling forward using hands - Activity 2': 1,
-    'keypoint_numpy_results_Falling backwards - Activity 1': 1,
-    'keypoint_numpy_results_Walking - Activity 6 ': 0,
-    'keypoint_numpy_results_Falling forward using knees - Activity 3': 1,
-    'keypoint_numpy_results_Falling from seated position - Activity 5 ': 1,
-    'keypoint_numpy_results_Falling sideways - Activity 4': 1,
-    'keypoint_numpy_results_Jumping - Activity 10': 0,
-    'keypoint_numpy_results_Laying Down - Activity 11': 0,
-    'keypoint_numpy_results_Sitting - Activity 8': 0,
-    'keypoint_numpy_results_Standing - Activity 7 ': 0,
-    'keypoint_numpy_results_Picking an object - Activity 9': 0,
+    'Dense_OF_numpy_results_Falling forward using hands - Activity 2': 1,
+    'Dense_OF_numpy_results_Falling backwards - Activity 1': 1,
+    'Dense_OF_numpy_results_Walking - Activity 6 ': 0,
+    'Dense_OF_numpy_results_Falling forward using knees - Activity 3': 1,
+    'Dense_OF_numpy_results_Falling from seated position - Activity 5 ': 1,
+    'Dense_OF_numpy_results_Falling sideways - Activity 4': 1,
+    'Dense_OF_numpy_results_Jumping - Activity 10': 0,
+    'Dense_OF_numpy_results_Laying Down - Activity 11': 0,
+    'Dense_OF_numpy_results_Sitting - Activity 8': 0,
+    'Dense_OF_numpy_results_Standing - Activity 7 ': 0,
+    'Dense_OF_numpy_results_Picking an object - Activity 9': 0,
 }
 
 
@@ -69,7 +69,7 @@ for folder_name in os.listdir(features_dir):
         features = np.array(features)
 
         # Extract sequences from the loaded features
-        num_frames = 2  # Number of frames per sequence
+        num_frames = 4  # Number of frames per sequence
         sequences, sequence_labels = extract_sequences(features, [label] * len(features), num_frames)
 
         # Append sequences and labels to lists
@@ -132,14 +132,14 @@ y_true = np.argmax(y_test, axis=1)
 
 # Calculate accuracy
 accuracy = accuracy_score(y_true, y_pred)
-print(f"LSTM Accuracy for Keypoints: {accuracy:.2f}")
+print(f"LSTM Accuracy for Dense Optical Flow: {accuracy:.2f}")
 
 # Calculate confusion matrix
 conf_matrix = confusion_matrix(y_true, y_pred)
-print("Confusion Matrix:")
+print("Confusion Matrix for Dense Optical Flow:")
 print(conf_matrix)
 
 # Print classification report
 class_report = classification_report(y_true, y_pred, target_names=[f'Class {i}' for i in range(num_classes)])
-print("Classification Report:")
+print("Classification Report for Dense Optical Flow:")
 print(class_report)
