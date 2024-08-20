@@ -23,13 +23,17 @@ def calculate_dense_optical_flow(frames):
 
     return flow_sequence
 
-def process_image_frames_dense_optical_flow(frame_folder, output_image_folder, output_numpy_folder, activity_name):
+def process_image_frames_dense_optical_flow(frame_folder, base_output_image_folder, base_output_numpy_folder, activity_name):
     frames = sorted(
         [os.path.join(frame_folder, f) for f in os.listdir(frame_folder) if f.endswith('.jpg') or f.endswith('.png')])
 
     if len(frames) < 6:
         print(f"Not enough frames to process in {activity_name}.")
         return
+
+    # Create directories based on activity name
+    output_image_folder = os.path.join(base_output_image_folder, f'Dense_OF_image_output_{activity_name}')
+    output_numpy_folder = os.path.join(base_output_numpy_folder, f'Dense_OF_numpy_results_{activity_name}')
 
     if not os.path.exists(output_image_folder):
         os.makedirs(output_image_folder)
@@ -64,6 +68,10 @@ def process_image_frames_dense_optical_flow(frame_folder, output_image_folder, o
 # Main Directory
 image_base_folder = '/Users/manniartivor/PycharmProjects/Fall-Detection/UP Fall Dataset'
 
+# Define base output folders
+base_output_image_folder = 'Dense OF Image Results'
+base_output_numpy_folder = 'Dense OF Numpy Results'
+
 # Loop through each class/activity folder in the dataset directory
 for activity_folder in os.listdir(image_base_folder):
     image_folder = os.path.join(image_base_folder, activity_folder)
@@ -73,9 +81,5 @@ for activity_folder in os.listdir(image_base_folder):
 
         print(f"Processing dense optical flow for activity: {activity_name}")
 
-        # Define output folders for dense optical flow
-        output_image_folder_lk = f'Dense_OF_image_output_{activity_name}'
-        output_numpy_folder_lk = f'Dense_OF_numpy_results_{activity_name}'
-
         # Process images for dense optical flow with a progress bar for each class
-        process_image_frames_dense_optical_flow(image_folder, output_image_folder_lk, output_numpy_folder_lk, activity_name)
+        process_image_frames_dense_optical_flow(image_folder, base_output_image_folder, base_output_numpy_folder, activity_name)

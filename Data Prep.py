@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 # Set the path to the directory where the features are stored
-features_dir = '//Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results '
+features_dir = '/Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results'
 
 # Initialize lists to hold data and labels
 X = []

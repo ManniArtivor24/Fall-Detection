@@ -9,7 +9,7 @@ from keras.utils import to_categorical
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 # Set the path to the directory where the features are stored
-features_dir = '//Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results '
+features_dir = '//Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results'
 
 # Initialize lists to hold data and labels
 X = []
