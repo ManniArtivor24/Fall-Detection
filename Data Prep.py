@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 # Set the path to the directory where the features are stored
 features_dir = '/Users/manniartivor/PycharmProjects/Fall-Detection/Keypoints Numpy Results'
@@ -58,3 +59,10 @@ print(f"X_train shape: {X_train.shape}")
 print(f"y_train shape: {y_train.shape}")
 print(f"X_test shape: {X_test.shape}")
 print(f"y_test shape: {y_test.shape}")
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.fit_transform(X_test)
+
+print(f"X_train_scaled shape: {X_train_scaled.shape}")
+print(f"X_test_scaled shape: {X_test_scaled.shape}")

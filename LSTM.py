@@ -30,7 +30,6 @@ label_map = {
     'keypoint_numpy_results_Picking an object - Activity 9': 0,
 }
 
-
 # Function to extract sequences from frames
 def extract_sequences(features, labels, num_frames):
     sequences = []
